@@ -18,9 +18,13 @@ const spinner = document.getElementById("spinner");
 
 let chartData = [["Date", "Followers"]];
 
-buttonGo.onclick = () => {
+buttonGo.onclick = (e) => {
   const username = inputUsername.value;
-  window.location.href = `/?username=${username}`;
+  const url = new URL(window.location.href);
+  url.searchParams.set("username", username);
+  console.log({ url });
+  window.location.href = url;
+  return false;
 };
 
 async function getProfile(username) {
@@ -117,6 +121,7 @@ function drawChart() {
 }
 
 async function onLoad() {
+  console.log({ location: window.location });
   const urlParams = new URLSearchParams(window.location.search);
   const username = urlParams.get("username");
   inputUsername.value = username;
