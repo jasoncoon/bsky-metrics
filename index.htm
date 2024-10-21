@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bluesky Metrics</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">Bluesky Metrics</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="https://github.com/jasoncoon/bsky-metrics"
+                ><i class="bi bi-github"></i
+              ></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container my-5">
+      <div class="col-lg-8 px-0">
+        <!-- <form class="row row-cols-lg-auto g-3 align-items-center">
+          <div class="col-12">
+            <label class="visually-hidden" for="inlineFormInputGroupUsername"
+              >Username</label
+            >
+            <div class="input-group">
+              <div class="input-group-text">@</div>
+              <input
+                id="inputUsername"
+                type="text"
+                class="form-control"
+                id="inlineFormInputGroupUsername"
+                placeholder="Username"
+              />
+            </div>
+          </div>
+
+          <div class="col-12">
+            <button id="buttonGo" class="btn btn-primary">Go</button>
+          </div>
+        </form> -->
+
+        <form class="d-flex" role="search">
+          <input
+            id="inputUsername"
+            class="form-control me-2"
+            type="search"
+            placeholder="Username"
+            aria-label="Username"
+            value="evilgeniuslabs.org"
+          />
+          <button id="buttonGo" class="btn btn-outline-success" type="submit">
+            Go
+          </button>
+        </form>
+      </div>
+      <img id="imgBanner" style="height: 150px; margin-top: 1rem" /><br />
+      <img id="imgAvatar" style="height: 90px" />
+      <div id="divDisplayName"></div>
+      <div id="divHandle"></div>
+      <a id="link" href=""></a>
+      <div id="divDescription"></div>
+      <div id="divCreated"></div>
+      <div id="divPosts"></div>
+      <div id="divFollows"></div>
+      <div id="divFollowers"></div>
+      <span
+        id="spinner"
+        style="display: none"
+        class="spinner-border"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </span>
+    </div>
+    <div id="divFollowersChart" style="width: 100%; height: 400px"></div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
