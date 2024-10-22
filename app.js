@@ -16,6 +16,7 @@ const inputUsername = document.getElementById("inputUsername");
 const link = document.getElementById("link");
 const spinner = document.getElementById("spinner");
 
+let displayName;
 let chartData;
 
 buttonGo.onclick = (e) => {
@@ -34,6 +35,7 @@ async function getProfile(username) {
     );
     const profile = await response.json();
     console.log({ profile, response });
+    displayName = profile.displayName;
     if (profile?.avatar && !imgAvatar.src) {
       imgAvatar.src = profile.avatar;
     }
@@ -115,7 +117,7 @@ function drawChart() {
   ]);
 
   chart.draw(data, {
-    title: "When your followers joined Bluesky",
+    title: `When ${displayName}'s followers joined Bluesky`,
     legend: "none",
   });
 }
