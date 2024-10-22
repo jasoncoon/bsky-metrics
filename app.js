@@ -16,7 +16,7 @@ const inputUsername = document.getElementById("inputUsername");
 const link = document.getElementById("link");
 const spinner = document.getElementById("spinner");
 
-let chartData = [["Date", "Followers"]];
+let chartData;
 
 buttonGo.onclick = (e) => {
   const username = inputUsername.value;
@@ -110,12 +110,12 @@ function drawChart() {
   chartData.sort((a, b) => a[0] - b[0]);
 
   var data = google.visualization.arrayToDataTable([
-    ["Date", "Followers"],
+    ["Date", "Joined Bluesky"],
     ...chartData,
   ]);
 
   chart.draw(data, {
-    title: "Followers",
+    title: "When your followers joined Bluesky",
     legend: "none",
   });
 }
