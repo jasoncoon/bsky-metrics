@@ -14,7 +14,10 @@ const imgAvatar = document.getElementById("imgAvatar");
 const imgBanner = document.getElementById("imgBanner");
 const inputUsername = document.getElementById("inputUsername");
 const link = document.getElementById("link");
-const spinner = document.getElementById("spinner");
+const loading = document.getElementById("loading");
+const spanStatus = document.getElementById('status');
+const divProgress = document.getElementById('progress');
+const tableBodyFollowers = document.getElementById('followersTableBody');
 
 let displayName;
 let chartData;
@@ -30,11 +33,19 @@ buttonGo.onclick = (e) => {
 
 async function getProfile(username) {
   try {
+    spanStatus.innerText = 'Getting profile...'
     let response = await fetch(
       `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
     );
     const profile = await response.json();
     console.log({ profile, response });
+    return profile;  
+  } catch (error) {
+    console.error("error getting profile: ", error);
+  }
+}
+
+async function updateProfileDisplay(profile) {
     displayName = profile.displayName;
     if (profile?.avatar && !imgAvatar.src) {
       imgAvatar.src = profile.avatar;
@@ -53,15 +64,13 @@ async function getProfile(username) {
     divCreated.innerText = `Member since: ${new Date(
       profile.createdAt
     ).toLocaleString()}`;
-    link.href = `https://bsky.app/profile/${username}`;
-    link.innerText = `https://bsky.app/profile/${username}`;
-  } catch (error) {
-    console.error("error getting profile: ", error);
-  }
+    link.href = `https://bsky.app/profile/${profile.handle}`;
+    link.innerText = `https://bsky.app/profile/${profile.handle}`;
 }
 
 async function getAllFollowers(username) {
-  spinner.style.display = "block";
+  loading.style.display = "block";
+  spanStatus.innerText = 'Getting followers...'
   const allFollowers = [];
   chartData = [];
   let subject = undefined;
@@ -88,7 +97,9 @@ async function getAllFollowers(username) {
   } while (cursor !== undefined);
 
   console.log({ subject, allFollowers });
-  spinner.style.display = "none";
+  loading.style.display = "none";
+
+  return allFollowers;
 }
 
 async function getFollowersPage(username, cursor) {
@@ -128,7 +139,58 @@ async function onLoad() {
   const username = urlParams.get("username");
   inputUsername.value = username;
   if (username) {
-    await getProfile(username);
-    await getAllFollowers(username);
+    const profile = await getProfile(username);
+    await updateProfileDisplay(profile);
+    const allFollowers = await getAllFollowers(username);
+    await getFollowerProfiles(allFollowers);
   }
+}
+
+async function getFollowerProfiles(allFollowers) {
+  loading.style.display = "block";
+  const followerProfiles = [];
+  tableBodyFollowers.innerHTML = '';
+
+  let i = 1;
+
+  let topFollower;
+
+  for (const follower of allFollowers) {
+    divProgress.innerText = `Getting follower profile ${i} of ${allFollowers.length}`;
+    const profile = await getProfile(follower.handle);
+    followerProfiles.push(profile);
+    if (!topFollower) topFollower = profile;
+    if (profile.followersCount > topFollower.followersCount) topFollower = profile;
+    i++;
+  }
+
+  followerProfiles.sort((a, b) => b.followersCount - a.followersCount);
+
+  for (const profile of followerProfiles) {
+    const row = tableBodyFollowers.insertRow();
+    let cell;
+    
+    cell = row.insertCell();
+    cell.innerHTML = `<a href="https://bsky.app/profile/${profile.handle}">${profile.displayName}</a>`;
+    
+    cell = row.insertCell();
+    cell.innerHTML = profile.followersCount?.toLocaleString();
+    
+    cell = row.insertCell();
+    cell.innerHTML = profile.followsCount.toLocaleString();
+    
+    cell = row.insertCell();
+    cell.innerHTML = (profile.followsCount ?? 0 / profile.followersCount ?? 1).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0});
+    
+    cell = row.insertCell();
+    cell.innerHTML = profile.postsCount.toLocaleString();
+    
+    cell = row.insertCell();
+    cell.innerHTML = new Date(profile.createdAt).toLocaleString();
+  }
+
+  loading.style.display = "none";
+  divProgress.innerHTML = '';
+
+  console.log({followerProfiles});
 }
