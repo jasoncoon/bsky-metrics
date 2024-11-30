@@ -46,7 +46,7 @@ async function getProfile(username) {
 }
 
 async function updateProfileDisplay(profile) {
-    displayName = profile.displayName;
+    displayName = profile.displayName || profile.handle;
     if (profile?.avatar && !imgAvatar.src) {
       imgAvatar.src = profile.avatar;
     }
@@ -54,7 +54,7 @@ async function updateProfileDisplay(profile) {
       imgBanner.src = profile.banner;
     }
     divDescription.innerText = profile.description;
-    divDisplayName.innerText = profile.displayName;
+    divDisplayName.innerText = displayName;
     divHandle.innerText = profile.handle;
     document.getElementById(
       "divFollows"
@@ -171,7 +171,7 @@ async function getFollowerProfiles(allFollowers) {
     let cell;
     
     cell = row.insertCell();
-    cell.innerHTML = `<a href="https://bsky.app/profile/${profile.handle}">${profile.displayName}</a>`;
+    cell.innerHTML = `<a href="https://bsky.app/profile/${profile.handle}">${profile.displayName || profile.handle}</a>`;
     
     cell = row.insertCell();
     cell.innerHTML = profile.followersCount?.toLocaleString();
@@ -180,7 +180,7 @@ async function getFollowerProfiles(allFollowers) {
     cell.innerHTML = profile.followsCount.toLocaleString();
     
     cell = row.insertCell();
-    cell.innerHTML = (profile.followsCount ?? 0 / profile.followersCount ?? 1).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0});
+    cell.innerHTML = ((profile.followsCount ?? 0) / (profile.followersCount ?? 1)).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0});
     
     cell = row.insertCell();
     cell.innerHTML = profile.postsCount.toLocaleString();
