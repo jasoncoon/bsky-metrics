@@ -53,7 +53,7 @@ async function updateProfileDisplay(profile) {
     if (profile?.banner && !imgBanner.src) {
       imgBanner.src = profile.banner;
     }
-    divDescription.innerText = profile.description;
+    divDescription.innerText = profile.description ?? '';
     divDisplayName.innerText = displayName;
     divHandle.innerText = profile.handle;
     document.getElementById(
