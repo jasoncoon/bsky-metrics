@@ -26,7 +26,7 @@ buttonGo.onclick = (e) => {
   const username = inputUsername.value;
   const url = new URL(window.location.href);
   url.searchParams.set("username", username);
-  console.log({ url });
+  // console.log({ url });
   window.location.href = url;
   return false;
 };
@@ -38,7 +38,7 @@ async function getProfile(username) {
       `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
     );
     const profile = await response.json();
-    console.log({ profile, response });
+    // console.log({ profile, response });
     return profile;  
   } catch (error) {
     console.error("error getting profile: ", error);
@@ -92,11 +92,11 @@ async function getAllFollowers(username) {
     for (const dateString of Object.keys(valuesByDate)) {
       chartData.push([new Date(dateString), valuesByDate[dateString]]);
     }
-    console.log({ chartData });
+    // console.log({ chartData });
     drawChart();
   } while (cursor !== undefined);
 
-  console.log({ subject, allFollowers });
+  // console.log({ subject, allFollowers });
   loading.style.display = "none";
 
   return allFollowers;
@@ -107,10 +107,10 @@ async function getFollowersPage(username, cursor) {
     cursor ?? ""
   }`;
   try {
-    console.log(getFollowersUrl);
+    // console.log(getFollowersUrl);
     let response = await fetch(getFollowersUrl);
     const json = await response.json();
-    console.log({ json, response });
+    // console.log({ json, response });
     return json;
   } catch (error) {
     console.error("error getting followers page: ", error);
@@ -134,7 +134,7 @@ function drawChart() {
 }
 
 async function onLoad() {
-  console.log({ location: window.location });
+  // console.log({ location: window.location });
   const urlParams = new URLSearchParams(window.location.search);
   const username = urlParams.get("username");
   inputUsername.value = username;
@@ -192,5 +192,5 @@ async function getFollowerProfiles(allFollowers) {
   loading.style.display = "none";
   divProgress.innerHTML = '';
 
-  console.log({followerProfiles});
+  // console.log({followerProfiles});
 }
