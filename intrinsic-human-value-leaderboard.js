@@ -5,14 +5,21 @@ if (!handles?.length) {
   handles = [
     "alexglow.bsky.social",
     "alpenglow.bsky.social",
+    "architeuthisflux.bsky.social",
+    "athousandprojects.com",
     "blenster.bsky.social",
-    "lasermistress.bsky.social",
+    "chipperdoodles.bsky.social",
+    "clomads.bsky.social",
     "desertember.bsky.social",
+    "eka.hn",
     "evilgeniuslabs.org",
     "geekmomprojects.com",
+    "guydupont.bsky.social",
     "ishotjr.bsky.social",
-    "architeuthisflux.bsky.social",
+    "joeycastillo.bsky.social",
+    "lasermistress.bsky.social",
     "leeborg.bsky.social",
+    "settinger.net",
     "straithe.bsky.social",
   ];
 }
