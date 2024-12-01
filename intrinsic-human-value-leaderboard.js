@@ -15,6 +15,7 @@ if (!handles?.length) {
     "evilgeniuslabs.org",
     "geekmomprojects.com",
     "guydupont.bsky.social",
+    "hannah.the-void.social",
     "ishotjr.bsky.social",
     "joeycastillo.bsky.social",
     "lasermistress.bsky.social",
