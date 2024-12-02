@@ -115,5 +115,5 @@ function submitHandles() {
   let newHandles = value.split('\n');
   newHandles = newHandles.map(handle => handle.trim()).filter(handle => !!handle);
   console.log(newHandles);
-  window.location = `/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(';')}`;
+  window.location = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(';')}`;
 }
