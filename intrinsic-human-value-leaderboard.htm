@@ -17,30 +17,28 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">Intrisic Human Value Dashboard | Bluesky Metrics</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarCollapse"
-          aria-controls="navbarCollapse"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                href="https://github.com/jasoncoon/bsky-metrics"
-                ><i class="bi bi-github"></i
-              ></a>
-            </li>
-          </ul>
-        </div>
+      <a class="navbar-brand" style="margin-left: 1rem;" href="#">Intrisic Human Value Dashboard | Bluesky Metrics</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarCollapse"
+        aria-controls="navbarCollapse"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="https://github.com/jasoncoon/bsky-metrics"
+              ><i class="bi bi-github"></i
+            ></a>
+          </li>
+        </ul>
       </div>
     </nav>
 
@@ -75,6 +73,24 @@
 
         </tbody>
       </table>
+    </div>
+
+    <div class="container">
+      <div class="mb-3">
+        <label for="handles" class="form-label">Profiles</label>
+        <textarea id="textAreaHandles" class="form-control" rows="3" aria-describedby="handlesHelp"></textarea>
+        <div id="handlesHelp" class="form-text">
+          Enter one profile per line.
+          Accepted formats: 
+          <ul>
+            <li>evilgeniuslabs.org</li>
+            <li>evilgeniuslabs.bsky.social</li>
+            <li>jasoncoon.bsky.social</li>
+          </ul>
+        </div>
+
+        <button id="buttonSubmitHandles" class="btn btn-primary">Submit</button>
+      </div>
     </div>
 
     <script

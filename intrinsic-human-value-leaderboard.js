@@ -1,6 +1,8 @@
 const urlParams = new URLSearchParams(window.location.search);
 let handles = urlParams.get("handles")?.split(';');
 
+console.log({handles});
+
 if (!handles?.length) {
   handles = [
     "alexglow.bsky.social",
@@ -28,21 +30,12 @@ if (!handles?.length) {
 const divLoading = document.getElementById("loading");
 const divProgress = document.getElementById('progress');
 const tableBody = document.getElementById('tableBody');
+const textAreaHandles = document.getElementById('textAreaHandles');
+const buttonSubmitHandles = document.getElementById('buttonSubmitHandles');
+
+buttonSubmitHandles.addEventListener('click', submitHandles);
 
 loadTable();
-
-async function getProfile(username) {
-  try {
-    let response = await fetch(
-      `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
-    );
-    const profile = await response.json();
-    // console.log({ profile, response });
-    return profile;  
-  } catch (error) {
-    console.error("error getting profile: ", error);
-  }
-}
 
 async function loadTable() {
   divLoading.style.display = "block";
@@ -102,4 +95,25 @@ async function loadTable() {
   divProgress.innerHTML = '';
 
   // console.log({profiles});
+}
+
+async function getProfile(username) {
+  try {
+    let response = await fetch(
+      `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
+    );
+    const profile = await response.json();
+    // console.log({ profile, response });
+    return profile;  
+  } catch (error) {
+    console.error("error getting profile: ", error);
+  }
+}
+
+function submitHandles() {
+  const value = textAreaHandles.value;
+  let newHandles = value.split('\n');
+  newHandles = newHandles.map(handle => handle.trim()).filter(handle => !!handle);
+  console.log(newHandles);
+  window.location = `/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(';')}`;
 }
