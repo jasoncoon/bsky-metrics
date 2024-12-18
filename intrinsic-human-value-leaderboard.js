@@ -47,11 +47,12 @@ async function loadTable() {
   for (const handle of handles) {
     divProgress.innerText = `Getting profile ${i} of ${handles.length}`;
     const profile = await getProfile(handle);
+    profile.handle = handle;
     profiles.push(profile);
     i++;
   }
 
-  profiles.sort((a, b) => b.followersCount - a.followersCount);
+  profiles.sort((a, b) => b.followersCount ?? 0 - a.followersCount ?? 0);
 
   i = 1;
 
@@ -103,7 +104,9 @@ async function getProfile(username) {
       `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
     );
     const profile = await response.json();
-    // console.log({ profile, response });
+    if (!response.ok) {
+      console.error(`Error getting profile ${username}: `, {profile, response});
+    }
     return profile;  
   } catch (error) {
     console.error("error getting profile: ", error);
