@@ -52,7 +52,7 @@ async function loadTable() {
     i++;
   }
 
-  profiles.sort((a, b) => b.followersCount ?? 0 - a.followersCount ?? 0);
+  profiles.sort((a, b) => (b.followersCount ?? 0) - (a.followersCount ?? 0));
 
   i = 1;
 
