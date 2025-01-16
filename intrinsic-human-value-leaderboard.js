@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
-let handles = urlParams.get("handles")?.split(';');
+let handles = urlParams.get("handles")?.split(";");
 
-console.log({handles});
+console.log({ handles });
 
 if (!handles?.length) {
   handles = [
@@ -18,7 +18,6 @@ if (!handles?.length) {
     "evilgeniuslabs.org",
     "geekmomprojects.com",
     "guydupont.bsky.social",
-    "hannah.the-void.social",
     "ishotjr.bsky.social",
     "joeycastillo.bsky.social",
     "lasermistress.bsky.social",
@@ -29,19 +28,19 @@ if (!handles?.length) {
 }
 
 const divLoading = document.getElementById("loading");
-const divProgress = document.getElementById('progress');
-const tableBody = document.getElementById('tableBody');
-const textAreaHandles = document.getElementById('textAreaHandles');
-const buttonSubmitHandles = document.getElementById('buttonSubmitHandles');
+const divProgress = document.getElementById("progress");
+const tableBody = document.getElementById("tableBody");
+const textAreaHandles = document.getElementById("textAreaHandles");
+const buttonSubmitHandles = document.getElementById("buttonSubmitHandles");
 
-buttonSubmitHandles.addEventListener('click', submitHandles);
+buttonSubmitHandles.addEventListener("click", submitHandles);
 
 loadTable();
 
 async function loadTable() {
   divLoading.style.display = "block";
-  tableBody.innerHTML = '';
-  
+  tableBody.innerHTML = "";
+
   const profiles = [];
   let i = 1;
 
@@ -58,35 +57,47 @@ async function loadTable() {
   i = 1;
 
   for (const profile of profiles) {
-    const followersPerFollow = ((profile.followersCount ?? 0) / (profile.followsCount ?? 0)).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 0 });
-    const followersPerPost = ((profile.followersCount ?? 0) / (profile.postsCount ?? 0)).toLocaleString(undefined, { style: 'percent', minimumFractionDigits:0 });
+    const followersPerFollow = (
+      (profile.followersCount ?? 0) / (profile.followsCount ?? 0)
+    ).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 0 });
+    const followersPerPost = (
+      (profile.followersCount ?? 0) / (profile.postsCount ?? 0)
+    ).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 0 });
 
     const row = tableBody.insertRow();
     let cell;
 
     cell = row.insertCell();
     cell.innerHTML = i.toLocaleString();
-    
+
     cell = row.insertCell();
-    cell.innerHTML = `<a href="https://bsky.app/profile/${profile.handle}">${profile.displayName || profile.handle}</a>`;
-    
+    cell.innerHTML = `<a href="https://bsky.app/profile/${profile.handle}">${
+      profile.displayName || profile.handle
+    }</a>`;
+
     cell = row.insertCell();
-    cell.innerHTML = profile.followersCount?.toLocaleString(); 
-    
+    cell.innerHTML = profile.followersCount?.toLocaleString();
+
     cell = row.insertCell();
     cell.innerHTML = profile.followsCount?.toLocaleString();
-    
+
     cell = row.insertCell();
-    cell.title = 'Followers per Follow';
-    cell.innerHTML = followersPerFollow.toLocaleString(undefined, { style: 'percent', minimumFractionDigits:0 });
-    
+    cell.title = "Followers per Follow";
+    cell.innerHTML = followersPerFollow.toLocaleString(undefined, {
+      style: "percent",
+      minimumFractionDigits: 0,
+    });
+
     cell = row.insertCell();
     cell.innerHTML = profile.postsCount?.toLocaleString();
 
     cell = row.insertCell();
-    cell.title = 'Followers per Post';
-    cell.innerHTML = followersPerPost.toLocaleString(undefined, { style: 'percent', minimumFractionDigits:0 });
-    
+    cell.title = "Followers per Post";
+    cell.innerHTML = followersPerPost.toLocaleString(undefined, {
+      style: "percent",
+      minimumFractionDigits: 0,
+    });
+
     cell = row.insertCell();
     cell.innerHTML = new Date(profile.createdAt).toLocaleString();
 
@@ -94,7 +105,7 @@ async function loadTable() {
   }
 
   divLoading.style.display = "none";
-  divProgress.innerHTML = '';
+  divProgress.innerHTML = "";
 
   // console.log({profiles});
 }
@@ -106,9 +117,12 @@ async function getProfile(username) {
     );
     const profile = await response.json();
     if (!response.ok) {
-      console.error(`Error getting profile ${username}: `, {profile, response});
+      console.error(`Error getting profile ${username}: `, {
+        profile,
+        response,
+      });
     }
-    return profile;  
+    return profile;
   } catch (error) {
     console.error("error getting profile: ", error);
   }
@@ -116,8 +130,12 @@ async function getProfile(username) {
 
 function submitHandles() {
   const value = textAreaHandles.value;
-  let newHandles = value.split('\n');
-  newHandles = newHandles.map(handle => handle.trim()).filter(handle => !!handle);
+  let newHandles = value.split("\n");
+  newHandles = newHandles
+    .map((handle) => handle.trim())
+    .filter((handle) => !!handle);
   console.log(newHandles);
-  window.location = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(';')}`;
+  window.location = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(
+    ";"
+  )}`;
 }
