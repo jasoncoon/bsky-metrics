@@ -23,7 +23,7 @@ if (!handles?.length) {
     "lasermistress.bsky.social",
     "leeborg.bsky.social",
     "settinger.net",
-    "straithe.bsky.social",
+    "straithe.com",
   ];
 }
 
