@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-undef
 google.charts.load("current", { packages: ["corechart"] });
+// eslint-disable-next-line no-undef
 google.charts.setOnLoadCallback(onLoad);
 
 const buttonGo = document.getElementById("buttonGo");
@@ -17,11 +19,10 @@ const link = document.getElementById("link");
 const loading = document.getElementById("loading");
 const spanStatus = document.getElementById("status");
 const divProgress = document.getElementById("progress");
-const tableBodyFollowers = document.getElementById("followersTableBody");
 
 let displayName;
 
-buttonGo.onclick = (e) => {
+buttonGo.onclick = () => {
   const username = inputUsername.value;
   const url = new URL(window.location.href);
   url.searchParams.set("username", username);
@@ -53,9 +54,7 @@ async function updateProfileDisplay(profile) {
   divDescription.innerText = profile.description ?? "";
   divDisplayName.innerText = displayName;
   divHandle.innerText = profile.handle;
-  document.getElementById(
-    "divFollows"
-  ).innerText = `Following: ${profile.followsCount.toLocaleString()}`;
+  divFollows.innerText = `Following: ${profile.followsCount.toLocaleString()}`;
   divFollowers.innerText = `Followers: ${profile.followersCount.toLocaleString()}`;
   divPosts.innerText = `Posts: ${profile.postsCount.toLocaleString()}`;
   divCreated.innerText = `Member since: ${new Date(
@@ -66,8 +65,10 @@ async function updateProfileDisplay(profile) {
 }
 
 function drawChart(chartData) {
+  // eslint-disable-next-line no-undef
   var chart = new google.visualization.LineChart(divFollowersChart);
 
+  // eslint-disable-next-line no-undef
   var data = google.visualization.arrayToDataTable([
     ["Date", "Followers"],
     ...chartData,

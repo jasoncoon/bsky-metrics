@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-undef
 google.charts.load("current", { packages: ["corechart"] });
+// eslint-disable-next-line no-undef
 google.charts.setOnLoadCallback(onLoad);
 
 const divLoading = document.getElementById("loading");
@@ -6,6 +8,7 @@ const divProgress = document.getElementById("progress");
 const tableBody = document.getElementById("tableBody");
 const textAreaHandles = document.getElementById("textAreaHandles");
 const buttonSubmitHandles = document.getElementById("buttonSubmitHandles");
+const divFollowersChart = document.getElementById("divFollowersChart");
 
 buttonSubmitHandles.addEventListener("click", submitHandles);
 
@@ -41,6 +44,7 @@ async function onLoad() {
     ];
   }
 
+  // eslint-disable-next-line no-undef
   chart = new google.visualization.LineChart(divFollowersChart);
 
   await loadTable();
@@ -117,8 +121,6 @@ async function loadTable() {
 
   divLoading.style.display = "none";
   divProgress.innerHTML = "";
-
-  // console.log({profiles});
 }
 
 async function getProfile(username) {
@@ -145,7 +147,6 @@ function submitHandles() {
   newHandles = newHandles
     .map((handle) => handle.trim())
     .filter((handle) => !!handle);
-  console.log(newHandles);
   window.location = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(
     ";"
   )}`;
@@ -156,29 +157,8 @@ async function loadChart() {
 
   let i = 1;
 
-  // need to build a two-dimensional array like this:
-  // const sampleData = [
-  //   // ["Date", "handle1", "handle2", "..."],
-  //   [new Date("2024-01-23"), 0, 1],
-  //   [new Date("2024-01-24"), 1, 2],
-  // ];
-
-  // will start by building a map of dates to handle follower count:
-  // const sampleDates = {
-  //   "2024-01-23": [
-  //     {
-  //       handle: "handle1",
-  //       followers: 0,
-  //     },
-  //     {
-  //       handle: "handle2",
-  //       followers: 1,
-  //     },
-  //   ],
-  // };
-
-  const dateItems = {};
   const loadedHandles = [];
+  const allItems = [];
 
   for (const handle of handles) {
     divProgress.innerText = `Getting followers chart data for profile ${i} of ${handles.length}: ${handle}`;
@@ -186,35 +166,33 @@ async function loadChart() {
     const response = await fetch(
       `https://social-metrics.evilgeniuslabs.org/query?social=Bluesky&handle=${handle}`
     );
-
     const body = await response.json();
-
     const items = body.Items;
-
-    items.sort((a, b) => a.date - b.date);
-
-    for (const item of items) {
-      let dateItem = dateItems[item.date];
-      if (!dateItem) {
-        dateItem = [];
-        dateItems[item.date] = dateItem;
-      }
-
-      dateItem.push({ handle, followers: item.followers });
+    if (!items) {
+      continue;
     }
 
     loadedHandles.push(handle);
 
-    // build an array out of the dateItems
+    items.sort((a, b) => a.date - b.date);
+
+    allItems.push(...items);
+
+    const allDates = getAllDates(allItems);
+
     const chartData = [["Date", ...loadedHandles]];
 
-    for (const date of Object.keys(dateItems)) {
-      const dateItem = dateItems[date];
+    for (const date of allDates) {
+      const row = [date];
+      for (const loadedHandle of loadedHandles) {
+        row.push(
+          allItems.find((i) => i.handle === loadedHandle && i.date === date)
+            ?.followers ?? undefined
+        );
+      }
 
-      chartData.push([date, ...dateItem.map((item) => item.followers)]);
+      chartData.push(row);
     }
-
-    console.log({ chartData });
 
     drawChart(chartData);
 
@@ -225,12 +203,24 @@ async function loadChart() {
   divProgress.innerHTML = "";
 }
 
-function drawChart(chartData) {
-  // const testData = [
-  //   [new Date("2024-01-23"), 0, 1],
-  //   [new Date("2024-01-24"), 1, 2],
-  // ];
+function getAllDates(items) {
+  const allDates = [];
 
+  for (const item of items) {
+    if (allDates.includes(item.date)) {
+      continue;
+    }
+
+    allDates.push(item.date);
+  }
+
+  allDates.sort();
+
+  return allDates;
+}
+
+function drawChart(chartData) {
+  // eslint-disable-next-line no-undef
   var data = google.visualization.arrayToDataTable(chartData);
 
   chart.draw(data, {
