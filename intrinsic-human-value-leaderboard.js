@@ -33,6 +33,7 @@ async function onLoad() {
       "desertember.bsky.social",
       "eka.hn",
       "evilgeniuslabs.org",
+      "gdotc.bsky.social",
       "geekmomprojects.com",
       "guydupont.bsky.social",
       "ishotjr.bsky.social",
@@ -160,11 +161,11 @@ async function loadChart() {
   const loadedHandles = [];
   const allItems = [];
 
-  for (const handle of handles) {
-    divProgress.innerText = `Getting followers chart data for profile ${i} of ${handles.length}: ${handle}`;
+  for (const currentHandle of handles) {
+    divProgress.innerText = `Getting followers chart data for profile ${i} of ${handles.length}: ${currentHandle}`;
 
     const response = await fetch(
-      `https://social-metrics.evilgeniuslabs.org/query?social=Bluesky&handle=${handle}`
+      `https://social-metrics.evilgeniuslabs.org/query?social=Bluesky&handle=${currentHandle}`
     );
     const body = await response.json();
     const items = body.Items;
@@ -172,7 +173,7 @@ async function loadChart() {
       continue;
     }
 
-    loadedHandles.push(handle);
+    loadedHandles.push(currentHandle);
 
     items.sort((a, b) => a.date - b.date);
 
@@ -180,11 +181,24 @@ async function loadChart() {
 
     const allDates = getAllDates(allItems);
 
-    const chartData = [["Date", ...loadedHandles]];
+    const latestTotals = loadedHandles.map((handle) => {
+      const sorted = allItems
+        .filter((i) => i.handle === handle)
+        .sort((a, b) => a.date - b.date);
+      const latestTotal = sorted[sorted.length - 1]?.followers;
+      console.log({ handle, sorted, latestTotal });
+      return { handle, latestTotal };
+    });
+
+    const sortedHandles = latestTotals
+      .sort((a, b) => b.latestTotal - a.latestTotal)
+      .map((h) => h.handle);
+
+    const chartData = [["Date", ...sortedHandles]];
 
     for (const date of allDates) {
       const row = [date];
-      for (const loadedHandle of loadedHandles) {
+      for (const loadedHandle of sortedHandles) {
         row.push(
           allItems.find((i) => i.handle === loadedHandle && i.date === date)
             ?.followers ?? undefined
