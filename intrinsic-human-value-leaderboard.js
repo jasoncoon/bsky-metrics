@@ -33,6 +33,7 @@ async function onLoad() {
       "desertember.bsky.social",
       "eka.hn",
       "evilgeniuslabs.org",
+      "flashingjanet.bsky.social",
       "gdotc.bsky.social",
       "geekmomprojects.com",
       "guydupont.bsky.social",
