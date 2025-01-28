@@ -9,12 +9,21 @@ const tableBody = document.getElementById("tableBody");
 const textAreaHandles = document.getElementById("textAreaHandles");
 const buttonSubmitHandles = document.getElementById("buttonSubmitHandles");
 const divFollowersChart = document.getElementById("divFollowersChart");
+const inputLogScale = document.getElementById("inputLogScale");
+const inputPointSize = document.getElementById("inputPointSize");
+const divHandleChecks = document.getElementById("divHandleChecks");
 
 buttonSubmitHandles.addEventListener("click", submitHandles);
+inputLogScale.addEventListener("change", drawChart);
+inputPointSize.addEventListener("change", drawChart);
 
 let handles;
 
 let chart;
+let chartData;
+
+let loadedHandles;
+let allItems;
 
 async function onLoad() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -51,7 +60,7 @@ async function onLoad() {
 
   await loadTable();
 
-  await loadChart();
+  await fetchChartData();
 }
 
 async function loadTable() {
@@ -154,13 +163,14 @@ function submitHandles() {
   )}`;
 }
 
-async function loadChart() {
+async function fetchChartData() {
   divLoading.style.display = "block";
+  document.getElementById("divChartControls").style.display = "block";
 
   let i = 1;
 
-  const loadedHandles = [];
-  const allItems = [];
+  loadedHandles = [];
+  allItems = [];
 
   for (const currentHandle of handles) {
     divProgress.innerText = `Getting followers chart data for profile ${i} of ${handles.length}: ${currentHandle}`;
@@ -180,42 +190,97 @@ async function loadChart() {
 
     allItems.push(...items);
 
-    const allDates = getAllDates(allItems);
+    loadChartData(loadedHandles);
 
-    const latestTotals = loadedHandles.map((handle) => {
-      const sorted = allItems
-        .filter((i) => i.handle === handle)
-        .sort((a, b) => a.date - b.date);
-      const latestTotal = sorted[sorted.length - 1]?.followers;
-      console.log({ handle, sorted, latestTotal });
-      return { handle, latestTotal };
-    });
-
-    const sortedHandles = latestTotals
-      .sort((a, b) => b.latestTotal - a.latestTotal)
-      .map((h) => h.handle);
-
-    const chartData = [["Date", ...sortedHandles]];
-
-    for (const date of allDates) {
-      const row = [date];
-      for (const loadedHandle of sortedHandles) {
-        row.push(
-          allItems.find((i) => i.handle === loadedHandle && i.date === date)
-            ?.followers ?? undefined
-        );
-      }
-
-      chartData.push(row);
-    }
-
-    drawChart(chartData);
+    drawChart();
 
     i++;
   }
 
+  createHandleCheckboxes();
+
   divLoading.style.display = "none";
   divProgress.innerHTML = "";
+}
+
+function loadChartData(loadedHandles) {
+  const checkedHandles = loadedHandles.filter((handle) => {
+    const checkbox = document.getElementById(`input${handle}`);
+    if (!checkbox) return true;
+    return checkbox.checked;
+  });
+
+  const items = allItems.filter((item) => checkedHandles.includes(item.handle));
+
+  const allDates = getAllDates(items);
+
+  const sortedHandles = getSortedHandles(loadedHandles);
+
+  const filteredHandles = sortedHandles.filter((handle) =>
+    checkedHandles.includes(handle)
+  );
+
+  chartData = [
+    [
+      "Date",
+      ...filteredHandles.map((handle) => handle.replace(".bsky.social", "")),
+    ],
+  ];
+
+  for (const date of allDates) {
+    const row = [date];
+    for (const handle of filteredHandles) {
+      row.push(
+        items.find((i) => i.handle === handle && i.date === date)?.followers ??
+          undefined
+      );
+    }
+
+    chartData.push(row);
+  }
+}
+
+function getSortedHandles(handles) {
+  const latestTotals = handles.map((handle) => {
+    const sorted = allItems
+      .filter((i) => i.handle === handle)
+      .sort((a, b) => a.date - b.date);
+    const latestTotal = sorted[sorted.length - 1]?.followers;
+    // console.log({ handle, sorted, latestTotal });
+    return { handle, latestTotal };
+  });
+
+  const sortedHandles = latestTotals
+    .sort((a, b) => b.latestTotal - a.latestTotal)
+    .map((h) => h.handle);
+
+  return sortedHandles;
+}
+
+function createHandleCheckboxes() {
+  const sortedHandles = getSortedHandles(handles);
+
+  divHandleChecks.innerHTML = "";
+
+  for (const handle of sortedHandles) {
+    const handleCheck = document.createElement("div");
+    handleCheck.setAttribute("class", "form-check");
+    handleCheck.innerHTML = `<input class="form-check-input" type="checkbox" id="input${handle}" checked>
+            <label class="form-check-label" for="input${handle}">
+              ${handle}
+            </label>`;
+
+    divHandleChecks.appendChild(handleCheck);
+
+    const input = document.getElementById(`input${handle}`);
+    input.addEventListener("change", reloadChart);
+  }
+}
+
+function reloadChart() {
+  loadChartData(handles);
+
+  drawChart();
 }
 
 function getAllDates(items) {
@@ -234,11 +299,20 @@ function getAllDates(items) {
   return allDates;
 }
 
-function drawChart(chartData) {
-  // eslint-disable-next-line no-undef
-  var data = google.visualization.arrayToDataTable(chartData);
+function drawChart() {
+  const logScale = inputLogScale.checked;
+  const pointSize = inputPointSize.value;
 
+  // eslint-disable-next-line no-undef
+  const data = google.visualization.arrayToDataTable(chartData);
+
+  // eslint-disable-next-line no-undef
   chart.draw(data, {
     title: `Followers over time`,
+    pointSize,
+    vAxis: {
+      logScale,
+      viewWindowMode: "maximized",
+    },
   });
 }
