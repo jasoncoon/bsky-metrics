@@ -310,6 +310,7 @@ function drawChart() {
     title: `Followers over time`,
     pointSize,
     vAxis: {
+      format: "short", // "#,###",
       logScale,
       viewWindowMode: "maximized",
     },
