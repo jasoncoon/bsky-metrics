@@ -50,7 +50,6 @@ async function onLoad() {
       "joeycastillo.bsky.social",
       "lasermistress.bsky.social",
       "leeborg.bsky.social",
-      "settinger.net",
       "straithe.com",
     ];
   }
