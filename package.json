@@ -3,14 +3,23 @@
   "version": "1.0.0",
   "description": "Just enter any Bluesky username (the part after the @) in the box and hit the Go button or enter/return key.",
   "main": "app.js",
+  "author": "Jason Coon",
+  "license": "ISC",
+  "type": "module",
+  "homepage": "https://jasoncoon.github.io/bsky-metrics",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasoncoon/bsky-metrics.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && npx serve",
+    "test": "eslint"
+  },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "eslint": "^9.19.0",
-    "globals": "^15.14.0"
-  },
-  "scripts": {
-    "test": "eslint"
-  },
-  "author": "",
-  "license": "ISC"
+    "globals": "^15.14.0",
+    "typescript": "^5.7.3"
+  }
 }

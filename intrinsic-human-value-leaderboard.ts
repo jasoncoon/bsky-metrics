@@ -1,33 +1,41 @@
-// eslint-disable-next-line no-undef
+import {
+  getElementById,
+  getProfile,
+  getSocialMetrics,
+  type Profile,
+  type SocialMetric,
+} from "./utils.js";
+
+// @ts-expect-error: google
 google.charts.load("current", { packages: ["corechart"] });
-// eslint-disable-next-line no-undef
+// @ts-expect-error: google
 google.charts.setOnLoadCallback(onLoad);
 
-const divLoading = document.getElementById("loading");
-const divProgress = document.getElementById("progress");
-const tableBody = document.getElementById("tableBody");
-const textAreaHandles = document.getElementById("textAreaHandles");
-const buttonSubmitHandles = document.getElementById("buttonSubmitHandles");
-const divFollowersChart = document.getElementById("divFollowersChart");
-const inputLogScale = document.getElementById("inputLogScale");
-const inputPointSize = document.getElementById("inputPointSize");
-const divHandleChecks = document.getElementById("divHandleChecks");
+const divLoading = getElementById("loading");
+const divProgress = getElementById("progress");
+const tableBody = getElementById("tableBody");
+const textAreaHandles = getElementById("textAreaHandles");
+const buttonSubmitHandles = getElementById("buttonSubmitHandles");
+const divFollowersChart = getElementById("divFollowersChart");
+const inputLogScale = getElementById("inputLogScale");
+const inputPointSize = getElementById("inputPointSize");
+const divHandleChecks = getElementById("divHandleChecks");
 
 buttonSubmitHandles.addEventListener("click", submitHandles);
 inputLogScale.addEventListener("change", drawChart);
 inputPointSize.addEventListener("change", drawChart);
 
-let handles;
+let handles: string[];
 
-let chart;
-let chartData;
+let chart: unknown;
+let chartData: (string | number | undefined)[][];
 
 let loadedHandles;
-let allItems;
+let allItems: SocialMetric[];
 
 async function onLoad() {
   const urlParams = new URLSearchParams(window.location.search);
-  handles = urlParams.get("handles")?.split(";");
+  handles = urlParams.get("handles")?.split(";") || [];
 
   if (!handles?.length) {
     handles = [
@@ -36,7 +44,7 @@ async function onLoad() {
       "architeuthisflux.bsky.social",
       "athousandprojects.com",
       "bhencke.bsky.social",
-      "blenster.bsky.social",
+      "blenster.com",
       "chipperdoodles.bsky.social",
       "clomads.bsky.social",
       "desertember.bsky.social",
@@ -54,7 +62,7 @@ async function onLoad() {
     ];
   }
 
-  // eslint-disable-next-line no-undef
+  // @ts-expect-error: google
   chart = new google.visualization.LineChart(divFollowersChart);
 
   await loadTable();
@@ -66,14 +74,16 @@ async function loadTable() {
   divLoading.style.display = "block";
   tableBody.innerHTML = "";
 
-  const profiles = [];
+  const profiles: Profile[] = [];
   let i = 1;
 
   for (const handle of handles) {
     divProgress.innerText = `Getting profile ${i} of ${handles.length}: ${handle}`;
     const profile = await getProfile(handle);
-    profile.handle = handle;
-    profiles.push(profile);
+    if (profile) {
+      profile.handle = handle;
+      profiles.push(profile);
+    }
     i++;
   }
 
@@ -82,12 +92,10 @@ async function loadTable() {
   i = 1;
 
   for (const profile of profiles) {
-    const followersPerFollow = (
-      (profile.followersCount ?? 0) / (profile.followsCount ?? 0)
-    ).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 0 });
-    const followersPerPost = (
-      (profile.followersCount ?? 0) / (profile.postsCount ?? 0)
-    ).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 0 });
+    const followersPerFollow =
+      (profile.followersCount ?? 0) / (profile.followsCount ?? 0);
+    const followersPerPost =
+      (profile.followersCount ?? 0) / (profile.postsCount ?? 0);
 
     const row = tableBody.insertRow();
     let cell;
@@ -133,38 +141,20 @@ async function loadTable() {
   divProgress.innerHTML = "";
 }
 
-async function getProfile(username) {
-  try {
-    const response = await fetch(
-      `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${username}`
-    );
-    const profile = await response.json();
-    if (!response.ok) {
-      console.error(`Error getting profile ${username}: `, {
-        profile,
-        response,
-      });
-    }
-    return profile;
-  } catch (error) {
-    console.error("error getting profile: ", error);
-  }
-}
-
 function submitHandles() {
-  const value = textAreaHandles.value;
+  const value = textAreaHandles.value as string;
   let newHandles = value.split("\n");
   newHandles = newHandles
     .map((handle) => handle.trim())
     .filter((handle) => !!handle);
-  window.location = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(
+  window.location.href = `/bsky-metrics/intrinsic-human-value-leaderboard.htm?handles=${newHandles.join(
     ";"
   )}`;
 }
 
 async function fetchChartData() {
   divLoading.style.display = "block";
-  document.getElementById("divChartControls").style.display = "block";
+  getElementById("divChartControls").style.display = "block";
 
   let i = 1;
 
@@ -174,18 +164,13 @@ async function fetchChartData() {
   for (const currentHandle of handles) {
     divProgress.innerText = `Getting followers chart data for profile ${i} of ${handles.length}: ${currentHandle}`;
 
-    const response = await fetch(
-      `https://social-metrics.evilgeniuslabs.org/query?social=Bluesky&handle=${currentHandle}`
-    );
-    const body = await response.json();
-    const items = body.Items;
-    if (!items) {
-      continue;
-    }
+    const items = await getSocialMetrics(currentHandle);
+
+    if (items?.length < 1) continue;
 
     loadedHandles.push(currentHandle);
 
-    items.sort((a, b) => a.date - b.date);
+    items.sort((a, b) => a.date.localeCompare(b.date));
 
     allItems.push(...items);
 
@@ -202,9 +187,11 @@ async function fetchChartData() {
   divProgress.innerHTML = "";
 }
 
-function loadChartData(loadedHandles) {
+function loadChartData(loadedHandles: string[]) {
   const checkedHandles = loadedHandles.filter((handle) => {
-    const checkbox = document.getElementById(`input${handle}`);
+    const checkbox = document.getElementById(
+      `input${handle}`
+    ) as HTMLFormElement;
     if (!checkbox) return true;
     return checkbox.checked;
   });
@@ -227,30 +214,31 @@ function loadChartData(loadedHandles) {
   ];
 
   for (const date of allDates) {
-    const row = [date];
+    const row: (string | number | undefined)[] = [date];
     for (const handle of filteredHandles) {
-      row.push(
+      const r =
         items.find((i) => i.handle === handle && i.date === date)?.followers ??
-          undefined
-      );
+        undefined;
+
+      row.push(r);
     }
 
     chartData.push(row);
   }
 }
 
-function getSortedHandles(handles) {
+function getSortedHandles(handles: string[]) {
   const latestTotals = handles.map((handle) => {
     const sorted = allItems
       .filter((i) => i.handle === handle)
-      .sort((a, b) => a.date - b.date);
+      .sort((a, b) => a.date.localeCompare(b.date));
     const latestTotal = sorted[sorted.length - 1]?.followers;
     // console.log({ handle, sorted, latestTotal });
     return { handle, latestTotal };
   });
 
   const sortedHandles = latestTotals
-    .sort((a, b) => b.latestTotal - a.latestTotal)
+    .sort((a, b) => (b.latestTotal ?? 0) - (a.latestTotal ?? 0))
     .map((h) => h.handle);
 
   return sortedHandles;
@@ -271,7 +259,7 @@ function createHandleCheckboxes() {
 
     divHandleChecks.appendChild(handleCheck);
 
-    const input = document.getElementById(`input${handle}`);
+    const input = getElementById(`input${handle}`);
     input.addEventListener("change", reloadChart);
   }
 }
@@ -282,8 +270,8 @@ function reloadChart() {
   drawChart();
 }
 
-function getAllDates(items) {
-  const allDates = [];
+function getAllDates(items: SocialMetric[]) {
+  const allDates: string[] = [];
 
   for (const item of items) {
     if (allDates.includes(item.date)) {
@@ -302,10 +290,10 @@ function drawChart() {
   const logScale = inputLogScale.checked;
   const pointSize = inputPointSize.value;
 
-  // eslint-disable-next-line no-undef
+  // @ts-expect-error: google
   const data = google.visualization.arrayToDataTable(chartData);
 
-  // eslint-disable-next-line no-undef
+  // @ts-expect-error: google
   chart.draw(data, {
     title: `Followers over time`,
     pointSize,
