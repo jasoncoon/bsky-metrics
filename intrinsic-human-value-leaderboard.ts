@@ -26,6 +26,7 @@ inputLogScale.addEventListener("change", drawChart);
 inputPointSize.addEventListener("change", drawChart);
 
 let handles: string[];
+let days: number | undefined;
 
 let chart: unknown;
 let chartData: (string | number | undefined)[][];
@@ -36,6 +37,8 @@ let allItems: SocialMetric[];
 async function onLoad() {
   const urlParams = new URLSearchParams(window.location.search);
   handles = urlParams.get("handles")?.split(";") || [];
+
+  days = parseInt(urlParams.get('days') || '30');
 
   if (!handles?.length) {
     handles = [
@@ -217,7 +220,7 @@ function loadChartData(loadedHandles: string[]) {
     const row: (string | number | undefined)[] = [date];
     for (const handle of filteredHandles) {
       const r =
-        items.find((i) => i.handle === handle && i.date === date)?.followers ??
+        items.find((i) => i.handle === handle && i.date === date)?.followers ||
         undefined;
 
       row.push(r);
@@ -273,8 +276,16 @@ function reloadChart() {
 function getAllDates(items: SocialMetric[]) {
   const allDates: string[] = [];
 
+  const date = new Date();
+  date.setDate(date.getDate() - (days ?? 30));
+  const startDate = date.toISOString();
+
   for (const item of items) {
     if (allDates.includes(item.date)) {
+      continue;
+    }
+
+    if (item.date < startDate) {
       continue;
     }
 
